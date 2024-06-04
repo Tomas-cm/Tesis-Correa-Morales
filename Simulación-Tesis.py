@@ -33,55 +33,10 @@ from tqdm import tqdm
 from IPython import get_ipython
 get_ipython().run_line_magic("matplotlib","qt5")
 
-#%%
-Γ = np.array([[1,2],[2,1]]) 
-R = np.sqrt(Γ)
-# print(R)
-# print(np.dot(R,R))
-
-Γ = np.array([[2,1],[1,2]])
-s = np.sqrt(Γ[0][0]*Γ[1][1]-Γ[1][0]**2)
-t = np.sqrt(Γ[0][0]+Γ[1][1]+2*s)
-sqrt_Γ = (1/t)*(Γ+s*np.identity(2))
-print(Γ)
-print(sqrt_Γ)
-print(np.dot(sqrt_Γ,sqrt_Γ))
-#%%
-
-Γ = np.array([[1,2],[3,4]]) 
-print(Γ[0][1])
-# print(Γ[0])
-
-#%% Funciones que probablemente no use
-
-def lineal(x, a, b):
-    return a*x+b
-
-def gaussiana(r, sig):
-#    r = np.sqrt((x-x0)**2 + (y-y0)**2)
-    return np.e**(-(r**2)/(2*sig**2))/(sig*np.sqrt(2*np.pi))
-
-def theta(x,y):
-    r = np.sqrt(x**2 + y**2)
-    if r == 0:
-        theta = 0
-    elif y >= 0 and r != 0:
-        theta = np.arccos(x/r)
-    else:
-        theta = -1*np.arccos(x/r)
-    return theta
-
-def gaussian_force(x, y, x0, y0, sig, f_max): # es el resultante de un potencial gaussiano *(-1)
-    r = np.sqrt((x-x0)**2 + (y-y0)**2)        # sig = std del potencial
-    tita = theta(x-x0, y-y0)                  # máx valor de la fuerza 
-    F_r = -f_max*(np.exp(0.5))*r*(np.exp(-(r**2)/(2*sig**2)))/sig
-    F_x = F_r*np.cos(tita)
-    F_y = F_r*np.sin(tita)
-    return F_x, F_y
 
 #%% Codigo de Simulación 
 m = 0.2 
-beta = 100
+beta = 10
 
 def matrix_sqrt(A):
     s = np.sqrt(A[0][0]*A[1][1]-A[1][0]**2)
@@ -101,6 +56,8 @@ def Mu_0(x,y): # = (f(x,y) - ∂xΦ(x,y) - ∂yΦ(x,y))/m
 
 def Gamma(x,y):
     Γ = [[0.5,0.2],[0.2,0.5]]
+    # Γ = [[1,0],[0,1]]
+    # Γ = [[0.5,0],[0,0.5]]
     return Γ
 
 def simu(x0,y0,vx_0,vy_0,T,N):
@@ -121,10 +78,11 @@ def simu(x0,y0,vx_0,vy_0,T,N):
         vy = mu_0[1] - gamma[1][0]*vx - gamma[1][1]*vy + a1*sqrt_Γ[1][0]*eta_x + a1*sqrt_Γ[1][1]*eta_y 
     return X, Y
 
+# Parametros para la simulacion
 
 x0, y0 = 0, 0
 vx_0, vy_0 = 5, 0
-T=1
+T=2 
 N = 1000
 
 x1, y1 = simu(x0,y0,vx_0,vy_0,T,N)
@@ -138,18 +96,66 @@ ax.scatter(x1[-1], y1[-1], color = "darkblue", label = "End", marker = "X",s = 1
 ax.axis('equal')
 
 
-s = 3 #int(n/T_frames)
+
 for i in range(N+1):           
-#    ax.plot(x5[i:i+s+1], y5[i:i+s+1], linewidths=0, marker='o', s=3, cmap=plt.cm.winter, zorder = 1) # la traza    
     ax.plot(x1[i:i+2], y1[i:i+2], color="k", alpha= (i/N)) # la traza 
 # ax.set_axis_off()
 ax.legend()
 plt.show()
 
+#%% Campo de fuerza: Vectores
+
+# Meshgrid 
+x, y = np.meshgrid(np.linspace(-1.5, 1.5, 10),  
+                   np.linspace(-1, 1, 10)) 
+  
+# Directional vectors 
+u = Mu_0(x, y)[0]*m
+v = Mu_0(x, y)[1]*m
+  
+
+# Plotting Vector Field with QUIVER 
+plt.close("all")
+plt.quiver(x, y, u, v, color='darkblue') 
+plt.title('Vector Field') 
+  
+# Setting x, y boundary limits 
+plt.xlim(-1.5, 1.5) 
+plt.ylim(-1, 1) 
+  
+# Show plot with grid 
+plt.grid() 
+plt.show() 
 
 
+#%% Campo de fuerza: Lineas de fuerza
 
 
+plt.close("all")
+
+# Particula con traza
+fig, ax = plt.subplots(1, 1, figsize=(8, 8))
+ax.scatter(x1[0], y1[0], color = "darkgreen", label = "Start", marker = "X",s = 300, zorder = 4)
+ax.scatter(x1[-1], y1[-1], color = "darkblue", label = "End", marker = "X",s = 300, zorder = 4)
+ax.axis('equal')
+for i in range(N+1):           
+    ax.plot(x1[i:i+2], y1[i:i+2], color="k", alpha= (i/N),linewidth=2) # la traza 
+
+# Campo de fuerza
+# 1D arrays 
+x = np.arange(-1,1,0.1) 
+y = np.arange(-1,1,0.1) 
+# Meshgrid 
+X,Y = np.meshgrid(x,y) 
+# Assign vector directions 
+u = Mu_0(X, Y)[0]*m
+v = Mu_0(X, Y)[1]*m
+plt.streamplot(X,Y,u,v, density=1, linewidth=None, color='#A23BEC', arrowsize=2) 
+  
+# Show plot with grid 
+plt.legend()
+plt.grid() 
+plt.show()
 
 
 
