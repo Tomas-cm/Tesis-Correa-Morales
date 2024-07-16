@@ -36,7 +36,7 @@ get_ipython().run_line_magic("matplotlib","qt5")
 
 #%% Codigo de Simulación 
 m = 0.2 
-beta = 10
+beta = 1
 
 def matrix_sqrt(A):
     s = np.sqrt(A[0][0]*A[1][1]-A[1][0]**2)
@@ -55,8 +55,8 @@ def Mu_0(x,y): # = (f(x,y) - ∂xΦ(x,y) - ∂yΦ(x,y))/m
     return mu_0 # = [mu_0x, mu_0y]
 
 def Gamma(x,y):
-    Γ = [[0.5,0.2],[0.2,0.5]]
-    # Γ = [[1,0],[0,1]]
+    # Γ = [[0.5,0.2],[0.2,0.5]]
+    Γ = [[1,0],[0,1]]
     # Γ = [[0.5,0],[0,0.5]]
     return Γ
 
@@ -82,8 +82,8 @@ def simu(x0,y0,vx_0,vy_0,T,N):
 
 x0, y0 = 0, 0
 vx_0, vy_0 = 5, 0
-T=2 
-N = 1000
+T=1 
+N = 5000
 
 x1, y1 = simu(x0,y0,vx_0,vy_0,T,N)
 # print(x1)
@@ -134,7 +134,7 @@ plt.show()
 plt.close("all")
 
 # Particula con traza
-fig, ax = plt.subplots(1, 1, figsize=(8, 8))
+fig, ax = plt.subplots(1, 1, figsize=(12, 12))
 ax.scatter(x1[0], y1[0], color = "darkgreen", label = "Start", marker = "X",s = 300, zorder = 4)
 ax.scatter(x1[-1], y1[-1], color = "darkblue", label = "End", marker = "X",s = 300, zorder = 4)
 ax.axis('equal')
